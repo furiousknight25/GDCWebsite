@@ -1,28 +1,45 @@
----
 name: Deploy to GitHub Pages
+
+# Run this workflow every time you push to the "main" branch
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
+# This gives the workflow permission to write to your gh-pages branch
 permissions:
   contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # 1. Checks out your repository's code
       - name: Checkout
         uses: actions/checkout@v4
+
+      # 2. Sets up the Java environment (required by Kobweb)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: "17"
-          distribution: temurin
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Installs the Kobweb binary
       - name: Install Kobweb
         uses: varabyte/kobweb-cli-action@v1.1.1
+      # --- ADD THIS TEST STEP ---
+      - name: Test Another Action
+        uses: actions/setup-node@v4 # Using a common, unrelated action
+        with:
+          node-version: '20'
+      # --- END OF TEST STEP ---
+      # 4. Exports the static site (HTML, CSS, JS)
       - name: Export Site
         run: kobweb export
+
+      # 5. Deploys the exported site to the "gh-pages" branch
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
-          folder: .kobweb/site
+          branch: gh-pages # The branch to deploy to
+          folder: .kobweb/site # The folder Kobweb exports to
