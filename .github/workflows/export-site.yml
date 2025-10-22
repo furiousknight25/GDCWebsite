@@ -15,7 +15,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      # 1. Checks out your repository's code, including the committed .kobweb/site folder
+      # 1. Checks out your repository's code so the workflow can access it
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -24,4 +24,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # The branch the action should deploy to
-          folder: .kobweb/site # The folder in your main branch containing the built site
+          # Use the full path within the runner's workspace
+          folder: ${{ github.workspace }}/.kobweb/site
