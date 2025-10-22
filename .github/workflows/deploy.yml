@@ -1,45 +1,91 @@
-name: Deploy to GitHub Pages
+name: Export Kobweb site
 
-# Run this workflow every time you push to the "main" branch
 on:
-  push:
-    branches: [ main ]
-
-# This gives the workflow permission to write to your gh-pages branch
-permissions:
-  contents: write
+  workflow_dispatch: #A
 
 jobs:
-  deploy:
+  export_and_upload:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      KOBWEB_CLI_VERSION: 0.9.21
+
     steps:
-      # 1. Checks out your repository's code
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # 2. Sets up the Java environment (required by Kobweb)
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          distribution: temurin
+          java-version: 11
 
-      # 3. Installs the Kobweb binary
-      - name: Install Kobweb
-        uses: varabyte/kobweb-cli-action@v1.1.1
-      # --- ADD THIS TEST STEP ---
-      - name: Test Another Action
-        uses: actions/setup-node@v4 # Using a common, unrelated action
-        with:
-          node-version: '20'
-      # --- END OF TEST STEP ---
-      # 4. Exports the static site (HTML, CSS, JS)
-      - name: Export Site
-        run: kobweb export
+      # When projects are created on Windows, the executable bit is sometimes lost. So set it back just in case.
+      - name: Ensure Gradle is executable
+        run: chmod +x gradlew
 
-      # 5. Deploys the exported site to the "gh-pages" branch
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      # B
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # C
+      - name: Query Browser Cache ID
+        id: browser-cache-id
+        run: echo "value=$(./gradlew -q :site:kobwebBrowserCacheId)" >> $GITHUB_OUTPUT
+
+      # Also C
+      - name: Cache Browser Dependencies
+        uses: actions/cache@v4
+        id: playwright-cache
         with:
-          branch: gh-pages # The branch to deploy to
-          folder: .kobweb/site # The folder Kobweb exports to
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.browser-cache-id.outputs.value }}
+
+      - name: Fetch kobweb
+        uses: robinraju/release-downloader@v1.9
+        with:
+          repository: "varabyte/kobweb-cli"
+          tag: "v${{ env.KOBWEB_CLI_VERSION }}"
+          fileName: "kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip"
+          tarBall: false
+          zipBall: false
+
+      - name: Unzip kobweb
+        run: unzip kobweb-${{ env.KOBWEB_CLI_VERSION }}.zip
+
+      - name: Run export
+        run: |
+          cd site
+          ../kobweb-${{ env.KOBWEB_CLI_VERSION }}/bin/kobweb export --notty --layout static
+
+      # D
+      - name: Upload site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site/.kobweb/site/
+          if-no-files-found: error
+          retention-days: 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
