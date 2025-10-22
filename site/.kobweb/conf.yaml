@@ -1,0 +1,14 @@
+site:
+  title: "Umdevclub"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/kotlin-webpack/js/developmentExecutable/umdgdc.js"
+      api: "build/libs/umdgdc.jar"
+    prod:
+      script: "build/kotlin-webpack/js/productionExecutable/umdgdc.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080
