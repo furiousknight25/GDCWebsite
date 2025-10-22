@@ -19,10 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Deploys the contents of the .kobweb/site folder to the 'gh-pages' branch
+      # 2. Deploys the contents of the site/.kobweb/site folder to the 'gh-pages' branch
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # The branch the action should deploy to
-          # Use the full path within the runner's workspace
-          folder: ${{ github.workspace }}/.kobweb/site
+          # CORRECTED PATH: Include the top-level 'site' directory
+          folder: site/.kobweb/site
