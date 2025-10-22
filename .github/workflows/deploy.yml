@@ -26,7 +26,7 @@ jobs:
 
       # 3. Installs the Kobweb binary
       - name: Install Kobweb
-        uses: varabyte/kobweb-cli-action@v1
+        uses: varabyte/kobweb-cli-action@v1.1.1
 
       # 4. Exports the static site (HTML, CSS, JS)
       - name: Export Site
