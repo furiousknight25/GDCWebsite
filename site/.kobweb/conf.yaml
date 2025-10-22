@@ -1,5 +1,6 @@
 site:
   title: "Umdevclub"
+  routePrefix: "GDCWebsite"
 
 server:
   files:
