@@ -1,43 +1,27 @@
 # Name of the workflow
-name: Deploy Kobweb Site to GitHub Pages
+name: Deploy Static Site to GitHub Pages
 
 # Run this workflow every time you push to the "main" branch
 on:
   push:
-    branches: [main] # Trigger on pushes to main
+    branches: [main]
 
 # Permissions needed to write to the gh-pages branch
 permissions:
   contents: write
 
 jobs:
-  # Job to build and deploy the site
+  # Job to deploy the pre-built site
   deploy:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      # 1. Checks out your repository's code so the workflow can access it
+      # 1. Checks out your repository's code, including the committed .kobweb/site folder
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Sets up the Java Development Kit (JDK) version 17, required by Kobweb
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin' # Use Eclipse Temurin distribution of Java
-
-      # 3. Installs the Kobweb command-line tool using the official action
-      - name: Install Kobweb
-        uses: varabyte/kobweb-cli-action@v1 # Use the official Kobweb action
-
-      # 4. Runs the 'kobweb export' command to build the static site
-      # The output goes into the .kobweb/site directory by default
-      - name: Export Site
-        run: kobweb export
-
-      # 5. Deploys the exported site files to the 'gh-pages' branch
+      # 2. Deploys the contents of the .kobweb/site folder to the 'gh-pages' branch
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # The branch the action should deploy to
-          folder: .kobweb/site # The folder in your repo containing the built site
+          folder: .kobweb/site # The folder in your main branch containing the built site
