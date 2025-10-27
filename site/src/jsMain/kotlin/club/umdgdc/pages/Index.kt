@@ -106,7 +106,7 @@ fun HomePage() {
 
                 Div(SubheadlineTextStyle.toAttrs()) { //subheadlinetextstyle makes this div stuff smalllll
                     SpanText("You can read the ")
-                    Link("/about", "About") //still not sure how the about page gets transfered to, ik theres a resources\markdown\about.md file but is that it?
+                    Link("/about", "About") // so theres a resources\markdown\about.md this is markdown file that kobweb automatically converts into html
                     SpanText(" page for more information.")
                 }
 
